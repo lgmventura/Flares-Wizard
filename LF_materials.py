@@ -18,13 +18,25 @@
 
 import bpy
 
+def set_render_engine():
+    bpy.context.scene.render.engine = 'BLENDER_EEVEE'
+
+def set_mode(material):
+    # set blend/shadow modes
+    material.blend_method = 'BLEND'
+    material.shadow_method = 'NONE'
+
 # Ghost element's Material
 def GhostElementMat(element, image):
     coll = bpy.context.scene.flare_group.coll
     index = bpy.context.scene.flare_group.index
     
-    bpy.context.scene.render.engine = 'CYCLES'
+    set_render_engine()
+    
     LF_Mat = bpy.data.materials.new("BLF_Material")
+
+    set_mode(LF_Mat)
+
     LF_Mat.use_nodes= True
     LF_Mat.node_tree.nodes.clear()
     #Adding new nodes
@@ -63,8 +75,8 @@ def GhostElementMat(element, image):
     mix5.inputs[1].default_value = [1.0,0.0,0.0,1.0]
     mix5.inputs[2].default_value = [0.0,0.0,1.0,1.0]
     
-    mapping.use_min = True    
-    mapping.use_max = True    
+    #mapping.use_min = True    
+    #mapping.use_max = True    
     if 'circle_smooth.jpg' not in bpy.data.images.keys():
         bpy.ops.image.open(filepath = image)        
         
@@ -113,8 +125,11 @@ def SimElementMat(element, image):
     coll = bpy.context.scene.flare_group.coll
     index = bpy.context.scene.flare_group.index
     
-    bpy.context.scene.render.engine = 'CYCLES'
+    set_render_engine()
     LF_Mat = bpy.data.materials.new("BLF_Material")
+
+    set_mode(LF_Mat)
+
     LF_Mat.use_nodes= True
     LF_Mat.node_tree.nodes.clear()
     #Adding new nodes
@@ -167,8 +182,11 @@ def LensElementMat(element, image, image2):
     coll = bpy.context.scene.flare_group.coll
     index = bpy.context.scene.flare_group.index
     
-    bpy.context.scene.render.engine = 'CYCLES'
+    set_render_engine()
     LF_Mat = bpy.data.materials.new("BLF_Material")
+
+    set_mode(LF_Mat)
+
     LF_Mat.use_nodes= True
     LF_Mat.node_tree.nodes.clear()
     #Adding new nodes
@@ -199,8 +217,8 @@ def LensElementMat(element, image, image2):
     mix2.inputs[0].default_value = 0.5
     mix2.inputs[2].default_value = coll[index].color
     
-    mapping2.use_min = True    
-    mapping2.use_max = True    
+    #mapping2.use_min = True    
+    #mapping2.use_max = True    
     
     if 'lens_dirt_4.jpg' not in bpy.data.images.keys():
         bpy.ops.image.open(filepath = image)
@@ -251,8 +269,11 @@ def StarElementMat(element, image, image2):
     coll = bpy.context.scene.flare_group.coll
     index = bpy.context.scene.flare_group.index
     
-    bpy.context.scene.render.engine = 'CYCLES'
+    set_render_engine()
     LF_Mat = bpy.data.materials.new("BLF_Material")
+
+    set_mode(LF_Mat)
+
     LF_Mat.use_nodes= True
     LF_Mat.node_tree.nodes.clear()
     #Adding new nodes
@@ -282,9 +303,10 @@ def StarElementMat(element, image, image2):
     mix2.inputs[2].default_value = coll[index].color
     mix3.inputs[0].default_value = 0.0
     hue.inputs[0].default_value = 1.0
-    mapping.use_min = True    
-    mapping.use_max = True 
-    mapping2.scale[1] = 0.98 
+    #mapping.use_min = True    
+    #mapping.use_max = True 
+    #mapping2.scale[1] = 0.98 
+    mapping2.inputs['Scale'].default_value[1] = 0.98 
     
     if 'ray1.jpg' not in bpy.data.images.keys():
         bpy.ops.image.open(filepath = image)
@@ -333,8 +355,11 @@ def BackgroundElementMat(element, image):
     coll = bpy.context.scene.flare_group.coll
     index = bpy.context.scene.flare_group.index
     
-    bpy.context.scene.render.engine = 'CYCLES'
+    set_render_engine()
     LF_Mat = bpy.data.materials.new("BLF_Material")
+
+    set_mode(LF_Mat)
+
     LF_Mat.use_nodes= True
     LF_Mat.node_tree.nodes.clear()
     #Adding new nodes

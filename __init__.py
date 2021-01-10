@@ -35,7 +35,7 @@ bl_info = {
 	"blender":     (2, 80, 0),
 	"wiki_url": "http://codeofart.com/flares-wizard/",
     "tracker_url": "http://codeofart.com/flares-wizard/",
-	"location":    "View 3D > Tool Shelf",
+	"location":    "View 3D > Properties > Lens Flares",
 	"category":    "3D View"
 	}
 addonFolder = inspect.getfile(inspect.currentframe())[0:-len("__init__.py")]
@@ -73,8 +73,7 @@ def Create_BLF_SYS():
     
     scn = bpy.context.scene
     cam = scn.camera
-    #target = scn.objects.active
-    target = bpy.context.active_object
+    target = bpy.context.view_layer.objects.active
     BLF_name = Get_PROP_Name('BLF_SYS')
     
     #main controller
@@ -521,22 +520,34 @@ def Create_Ghost_Element():
         
         # driver for texture coordinates
         # x scale        
-        driver = material['Mapping'].driver_add("scale", 0)
+
+        #driver = material['Mapping'].driver_add("scale", 0)
+        driver = material['Mapping'].inputs['Scale'].driver_add("default_value", 0)
+
         add_prop_var(driver, 'bord', 'OBJECT', element, '["outline"]') 
         driver.driver.expression = 'bord+1'
         
         # y scale        
-        driver = material['Mapping'].driver_add("scale", 1)
+
+        #driver = material['Mapping'].driver_add("scale", 1)
+        driver = material['Mapping'].inputs['Scale'].driver_add("default_value", 1)
+
         add_prop_var(driver, 'bord', 'OBJECT', element, '["outline"]') 
         driver.driver.expression = 'bord+1'
         
         # x location        
-        driver = material['Mapping'].driver_add("translation", 0)
+
+        #driver = material['Mapping'].driver_add("translation", 0)
+        driver = material['Mapping'].inputs['Location'].driver_add("default_value", 0)
+
         add_prop_var(driver, 'bord', 'OBJECT', element, '["outline"]') 
         driver.driver.expression = '-bord/2'
         
         # y location
-        driver = material['Mapping'].driver_add("translation", 1)
+
+        #driver = material['Mapping'].driver_add("translation", 1)
+        driver = material['Mapping'].inputs['Location'].driver_add("default_value", 1)
+
         add_prop_var(driver, 'bord', 'OBJECT', element, '["outline"]') 
         driver.driver.expression = '-bord/2'
 
@@ -625,7 +636,8 @@ def Create_Lens_Dirt_Element():
         add_prop_var(driver, 'focal', 'OBJECT', cam, 'data.lens')
         add_prop_var(driver, 'lens', 'OBJECT', cam, 'data.sensor_width')
         add_transform_var(driver, 'Z', ele_cont, 'LOC_Z', 'LOCAL_SPACE')
-        driver.driver.expression = str(10/3) +'*(Z/(focal/lens)) if (resolution_x > resolution_y) else (resolution_x/(resolution_y*2))*(Z/(focal/lens))*20/3'
+        #driver.driver.expression = str(10/3) +'*(Z/(focal/lens)) if (resolution_x > resolution_y) else (resolution_x/(resolution_y*2))*(Z/(focal/lens))*20/3'
+        driver.driver.expression = str(0.5) +'*(Z/(focal/lens)) if (resolution_x > resolution_y) else (resolution_x/(resolution_y*2))*(Z/(focal/lens))'
         
         # scale y 
         driver = element.driver_add("scale", 1)
@@ -634,7 +646,8 @@ def Create_Lens_Dirt_Element():
         add_prop_var(driver, 'focal', 'OBJECT', cam, 'data.lens')
         add_prop_var(driver, 'lens', 'OBJECT', cam, 'data.sensor_width')
         add_transform_var(driver, 'Z', ele_cont, 'LOC_Z', 'LOCAL_SPACE')            
-        driver.driver.expression = str(10/3) +'*(Z/(focal/lens)) if (resolution_y > resolution_x) else (resolution_y/(resolution_x*2))*(Z/(focal/lens))*20/3'
+        #driver.driver.expression = str(10/3) +'*(Z/(focal/lens)) if (resolution_y > resolution_x) else (resolution_y/(resolution_x*2))*(Z/(focal/lens))*20/3'
+        driver.driver.expression = str(0.5) +'*(Z/(focal/lens)) if (resolution_y > resolution_x) else (resolution_y/(resolution_x*2))*(Z/(focal/lens))'
              
         # Constrains        
         element.constraints.new('LIMIT_ROTATION')
@@ -664,24 +677,36 @@ def Create_Lens_Dirt_Element():
         
         # drivers for texture coordinates
         # x scale
-        driver = material['Mapping.001'].driver_add("scale", 0)
+
+        #driver = material['Mapping.001'].driver_add("scale", 0)
+        driver = material['Mapping.001'].inputs['Scale'].driver_add("default_value", 0)
+
         add_prop_var(driver, 'scale_x', 'OBJECT', element, '["scale"]') 
         driver.driver.expression = 'scale_x'
         
         # y scale
-        driver = material['Mapping.001'].driver_add("scale", 1)
+
+        #driver = material['Mapping.001'].driver_add("scale", 1)
+        driver = material['Mapping.001'].inputs['Scale'].driver_add("default_value", 1)
+
         add_prop_var(driver, 'scale_y', 'OBJECT', element, '["scale"]') 
         driver.driver.expression = 'scale_y'
         
         # x location
-        driver = material['Mapping.001'].driver_add("translation", 0)
+
+        #driver = material['Mapping.001'].driver_add("translation", 0)
+        driver = material['Mapping.001'].inputs['Location'].driver_add("default_value", 0)
+
         add_prop_var(driver, 'scale', 'OBJECT', element, '["scale"]')
         add_transform_var(driver, 'x', ele_cont, 'LOC_X', 'LOCAL_SPACE')
         add_transform_var(driver, 'X_scale', cam, 'SCALE_X', 'WORLD_SPACE')  
         driver.driver.expression = '0.5-x*scale*X_scale'
         
         # y location
-        driver = material['Mapping.001'].driver_add("translation", 1)
+
+        #driver = material['Mapping.001'].driver_add("translation", 1)
+        driver = material['Mapping.001'].inputs['Location'].driver_add("default_value", 1)
+
         add_prop_var(driver, 'scale', 'OBJECT', element, '["scale"]')
         add_transform_var(driver, 'y', ele_cont, 'LOC_Y', 'LOCAL_SPACE')
         add_transform_var(driver, 'Y_scale', cam, 'SCALE_Y', 'WORLD_SPACE') 
@@ -749,12 +774,13 @@ def Create_Star_Element():
         # The Element
         element =  add_flare_object('plane', Get_OB_Name('Star_Element'), flare, Get_OB_Name('Star_Element'), cam, hide = False)       
         
-        # moving the verts = new origin location
+        #moving the verts = new origin location
         bm = bmesh.new()
         me = element.data
         bm.from_mesh(me)
         for v in bm.verts:
-            v.co.y += 1.15
+            #v.co.y += 1.15
+            v.co.y += element.dimensions.y
             bm.to_mesh(me)
         bm.free()
         
@@ -873,11 +899,17 @@ def Create_Star_Element():
         driver.driver.expression = 'fac * glob'
         # drivers for the mapping
         # y scale
-        driver = material['Mapping'].driver_add("scale", 1)
+
+        #driver = material['Mapping'].driver_add("scale", 1)
+        driver = material['Mapping'].inputs['Scale'].driver_add("default_value", 1)
+
         add_prop_var(driver, 'fac', 'OBJECT', element, '["color_scale"]') 
         driver.driver.expression = 'fac'
         # y position
-        driver = material['Mapping'].driver_add("translation", 1)
+
+        #driver = material['Mapping'].driver_add("translation", 1)
+        driver = material['Mapping'].inputs['Location'].driver_add("default_value", 1)
+
         add_prop_var(driver, 'fac', 'OBJECT', element, '["color_position"]') 
         driver.driver.expression = 'fac'
         
@@ -1368,7 +1400,7 @@ def restore_selection(sel_ob, act_ob):
     bpy.ops.object.select_all(action = 'DESELECT')
     for ob in sel_ob:
         ob.select_set(True)
-    bpy.context.view_layer.objects.active = act_ob  
+    bpy.context.view_layer.objects.active = act_ob
 
 # Delete lens flare
 def deleteFlare():
@@ -1389,7 +1421,7 @@ def deleteFlare():
                     if mesh not in meshes:
                         meshes.append(mesh)
                     if (material not in materials) and (material != None):
-                        materials.append(material)                        
+                        materials.append(material)
                 bpy.context.collection.objects.unlink(ob)
                 bpy.data.objects.remove(ob)
         if len(materials) > 0:
@@ -1426,7 +1458,7 @@ def deleteElement():
         if obj.get(object) is not None:
             if len(obj[object].material_slots) > 0:
                 material = obj[object].material_slots[0].material
-            mesh = obj[object].data           
+            mesh = obj[object].data
             bpy.context.collection.objects.unlink(obj[object])
             bpy.data.objects.remove(obj[object])    
                     
@@ -1543,7 +1575,8 @@ def get_ghost_duplis():
 def show_all_elements():
     elements = get_flare_elements()
     for element in elements:
-        element.hide = False
+        element.hide_set(False)
+        element.hide_viewport = False
     if len(elements) > 0:
         elements[0].animation_data.drivers[0].driver.expression = elements[0].animation_data.drivers[0].driver.expression
            
@@ -1552,7 +1585,8 @@ def show_all_elements():
 def hide_all_elements():
     elements = get_flare_elements()
     for element in elements:
-        element.hide = True
+        element.hide_set(True)
+        element.hide_viewport = True
     if len(elements) > 0:
         elements[0].animation_data.drivers[0].driver.expression = elements[0].animation_data.drivers[0].driver.expression    
         
@@ -1564,8 +1598,10 @@ def solo_selected_element():
     if len(coll) > 0:
         active_element = obj[coll[index].object]        
         for element in elements:
-            element.hide = True
-        active_element.hide = False 
+            element.hide_set(True)
+            element.hide_viewport = True
+        active_element.hide_set(False)
+        active_element.hide_viewport = False
     if len(elements) > 0:
         elements[0].animation_data.drivers[0].driver.expression = elements[0].animation_data.drivers[0].driver.expression                     
     
@@ -1605,8 +1641,9 @@ def update_lists(self,context):
         bpy.ops.object.select_all(action = 'DESELECT')
         target =  cont.constraints[0].target
         if target != None:
-            target.select = True        
-            obj.active = target
+            target.select_set(True)
+            bpy.context.view_layer.objects.active = target
+            #obj.active = target
             
     return None
 
@@ -1739,10 +1776,10 @@ def update_ghost_element(self, context):
                 dupli.location = Vector((0, 0, 0))
                 dupli.rotation_euler = Euler((0.0, 0.0, 0.0), 'XYZ')
                 dupli.hide_select = True
-                scn.objects.link(dupli)
+                bpy.context.collection.objects.link(dupli)
                 dupli[get_active_flare()] = ''
                 dupli['IS_BLF'] = ''
-                dupli.draw_type = 'WIRE'
+                dupli.display_type = 'TEXTURED'
                 set_ray_visibility(dupli)
                 
                 # drivers
@@ -1798,12 +1835,15 @@ def update_ghost_element(self, context):
                 add_prop_var(driver, 'global_scale', 'OBJECT', target, '["scale"]')
                 driver.driver.expression = "y * scale*global_scale*randomize(1-min,seed+"+str(n)+")"
                 # driver for visibility
-                driver = dupli.driver_add("hide")
+
+                #driver = dupli.driver_add("hide")
+                driver = dupli.driver_add("hide_viewport")
+
                 add_prop_var(driver, 'visibility', 'OBJECT', element, 'hide') 
                 driver.driver.expression = 'visibility'
         elif count < old_count+1:
             for n in range(count, old_count+1):
-                obj.unlink(obj[element.name+'_Dupli'+str(n)])
+                #obj.unlink(obj[element.name+'_Dupli'+str(n)])
                 bpy.data.objects.remove(bpy.data.objects[element.name+'_Dupli'+str(n)])    
             
         element['count']  = count
@@ -1830,10 +1870,10 @@ def update_star_element(self, context):
                 dupli.location = element.location
                 dupli.rotation_euler = Euler((0.0, 0.0, 0.0), 'XYZ')
                 dupli.hide_select = True
-                scn.objects.link(dupli)
+                bpy.context.collection.objects.link(dupli)
                 dupli[get_active_flare()] = ''
                 dupli['IS_BLF'] = ''
-                dupli.draw_type = 'WIRE'
+                dupli.display_type = 'TEXTURED'
                 set_ray_visibility(dupli)
                 
                 # drivers
@@ -1888,12 +1928,15 @@ def update_star_element(self, context):
                 add_prop_var(driver, 'global_scale', 'OBJECT', target, '["scale"]')
                 driver.driver.expression = "y * scale*global_scale*randomize(1-min,seed+"+str(n)+")"
                 # driver for visibility
-                driver = dupli.driver_add("hide")
+
+                #driver = dupli.driver_add("hide")
+                driver = dupli.driver_add("hide_viewport")
+
                 add_prop_var(driver, 'visibility', 'OBJECT', element, 'hide') 
                 driver.driver.expression = 'visibility'
         elif count < old_count+1:
             for n in range(count, old_count+1):
-                obj.unlink(obj[element.name+'_Dupli'+str(n)])
+                #obj.unlink(obj[element.name+'_Dupli'+str(n)])
                 bpy.data.objects.remove(bpy.data.objects[element.name+'_Dupli'+str(n)])    
             
         element['count']  = count
@@ -1908,9 +1951,9 @@ def load_update_preview(self, context):
         flare = scn.LF_previews
         sel, act = get_sel_ob()
         filename, file_extension = os.path.splitext(flare)
-        if bpy.context.active_object == None :
+        if bpy.context.view_layer.objects.active == None :
             print("No active object in the scene.")
-        elif bpy.context.active_object.type == 'CAMERA' :
+        elif bpy.context.view_layer.objects.active.type == 'CAMERA' :
             print("Can't add a lens flare to camera.")
         elif bpy.context.scene.camera == None :
             print("No camera in the scene.")
@@ -1979,7 +2022,7 @@ def scan_and_repair():
                     if mesh not in meshes:
                         meshes.append(mesh)
                     if material not in materials:
-                        materials.append(material)                        
+                        materials.append(material)
                 bpy.context.collection.objects.unlink(ob)
                 bpy.data.objects.remove(ob)
         if len(materials) > 0:
@@ -2046,7 +2089,7 @@ def scan_and_repair():
                 conts2.append(e['controller'])            
             for c in conts:
                 if c not in conts2:
-                    if obj.get(c) is not None:                    
+                    if obj.get(c) is not None:
                         bpy.context.collection.objects.unlink(obj[c])
                         bpy.data.objects.remove(bpy.data.objects[c])                    
                         print('"' + c+ '" not a part of any element -> Deleted' )
@@ -2069,7 +2112,7 @@ def scan_and_repair():
                     if obj.get(ele.name) is not None:
                         if len(ele.material_slots) > 0:
                             material = ele.material_slots[0].material
-                        mesh = ele.data           
+                        mesh = ele.data
                         bpy.context.collection.objects.unlink(ele)
                         bpy.data.objects.remove(ele)
                         print('Element "' + name + '" do not have a controller -> Deleted')                           
@@ -2104,44 +2147,44 @@ def scan_and_repair():
 # Groups for the UI lists
 # lens flare
 class Flare(PropertyGroup):
-    object = StringProperty()
-    pivot = StringProperty()
-    helper = StringProperty()
-    cam_vis = StringProperty()
-    flare = StringProperty()
-    cam_vis = StringProperty()
-    name = StringProperty(update = update_flare_name)
-    color = FloatVectorProperty(size = 4,subtype='COLOR',default=[1.0,1.0,1.0,1.0], min = 0.0, max = 1.0, update = update_elements_color, description = "Global color")
-    visibility = BoolProperty(default = False, update = update_intensity, description = "When the Flare is no longer visible by the camera will fade out")
-    opstacles = BoolProperty(default = False, update = update_intensity, description = "Enable using the obstacle detection feature")
-    blinking = BoolProperty(default = False, update = update_intensity, description = "Enable the blinking system")
-    copy_to_lamp = BoolProperty(default = False, update = update_elements_color, description = "The lamp will get the color of the Lens flare")
+    object: StringProperty()
+    pivot: StringProperty()
+    helper: StringProperty()
+    cam_vis: StringProperty()
+    flare: StringProperty()
+    cam_vis: StringProperty()
+    name: StringProperty(update = update_flare_name)
+    color: FloatVectorProperty(size = 4,subtype='COLOR',default=[1.0,1.0,1.0,1.0], min = 0.0, max = 1.0, update = update_elements_color, description = "Global color")
+    visibility: BoolProperty(default = False, update = update_intensity, description = "When the Flare is no longer visible by the camera will fade out")
+    opstacles: BoolProperty(default = False, update = update_intensity, description = "Enable using the obstacle detection feature")
+    blinking: BoolProperty(default = False, update = update_intensity, description = "Enable the blinking system")
+    copy_to_lamp: BoolProperty(default = False, update = update_elements_color, description = "The lamp will get the color of the Lens flare")
         
    
 class FlareGroup(PropertyGroup):
-    coll = CollectionProperty(type=Flare)
-    index = IntProperty(update = update_lists )
+    coll: CollectionProperty(type=Flare)
+    index: IntProperty(update = update_lists )
     
 # elements    
 class Elements(PropertyGroup):
-    object = StringProperty()
-    type = StringProperty()
-    name = StringProperty(update = update_element_name)
-    cont = StringProperty()
-    ghosts_count = IntProperty(default = 5, min = 1, max = 99, description = 'Total number of ghosts', update = update_ghost_element)
-    streaks_count = IntProperty(default = 5, min = 1, max = 199, description = 'Total number of streaks', update = update_star_element)
+    object: StringProperty()
+    type: StringProperty()
+    name: StringProperty(update = update_element_name)
+    cont: StringProperty()
+    ghosts_count: IntProperty(default = 5, min = 1, max = 99, description = 'Total number of ghosts', update = update_ghost_element)
+    streaks_count: IntProperty(default = 5, min = 1, max = 199, description = 'Total number of streaks', update = update_star_element)
         
 class ElementGroup(PropertyGroup):
-    coll = CollectionProperty(type=Elements)
-    index = IntProperty(default = 0)
+    coll: CollectionProperty(type=Elements)
+    index: IntProperty(default = 0)
 # opstacles
 class Opstacles(PropertyGroup):
-    flare = StringProperty()
-    name = StringProperty()
+    flare: StringProperty()
+    name: StringProperty()
     
 class OpstaclesGroup(PropertyGroup):
-    coll = CollectionProperty(type=Opstacles)
-    index = IntProperty(default = 0)    
+    coll: CollectionProperty(type=Opstacles)
+    index: IntProperty(default = 0)
 
 ###### Operators #######
 
@@ -2153,9 +2196,9 @@ class CreateLensFlare(Operator):
 
     def execute(self, context):
         sel, act = get_sel_ob()
-        if bpy.context.active_object == None :
+        if bpy.context.view_layer.objects.active == None :
             self.report({'WARNING'}, "No active object in the scene.")
-        elif bpy.context.active_object.type == 'CAMERA' :
+        elif bpy.context.view_layer.objects.active.type == 'CAMERA' :
             self.report({'WARNING'}, "Can't add a lens flare to camera.")
         elif bpy.context.scene.camera == None :
             self.report({'WARNING'}, "No camera in the scene.")    
@@ -2280,9 +2323,9 @@ class DuplicateFlare(Operator):
         
     def execute(self, context):
         coll, index = get_flare_group()
-        if bpy.context.active_object == None :
+        if bpy.context.view_layer.objects.active == None :
             self.report({'WARNING'}, "No active object in the scene.")
-        elif bpy.context.active_object.type == 'CAMERA' :
+        elif bpy.context.view_layer.objects.active.type == 'CAMERA' :
             self.report({'WARNING'}, "Can't add a lens flare to camera.")
         elif len(coll) == 0:
             self.report({'WARNING'}, "Nothing to duplicate.")                
@@ -2297,7 +2340,7 @@ class SaveFlare(Operator):
     bl_idname = "flare.save"
     bl_label = "Save"
     bl_description = "Save selected lens flare."
-    filepath = StringProperty(subtype="FILE_PATH")    
+    filepath: StringProperty(subtype="FILE_PATH")
         
     def execute(self, context):        
         coll, index = get_flare_group()     
@@ -2321,15 +2364,15 @@ class LoadFlare(Operator):
     bl_idname = "flare.load"
     bl_label = "Load"
     bl_description = "Load lens flare."
-    filepath = StringProperty(subtype="FILE_PATH")
+    filepath: StringProperty(subtype="FILE_PATH")
     
     def execute(self, context):
         sel, act = get_sel_ob()
         filename, file_extension = os.path.splitext(self.filepath)
         file = os.path.basename(filename)
-        if bpy.context.active_object == None :
+        if bpy.context.view_layer.objects.active == None :
             self.report({'WARNING'}, "No active object in the scene.")
-        elif bpy.context.active_object.type == 'CAMERA' :
+        elif bpy.context.view_layer.objects.active.type == 'CAMERA' :
             self.report({'WARNING'}, "Can't add a lens flare to camera.")
         elif bpy.context.scene.camera == None :
             self.report({'WARNING'}, "No camera in the scene.")
@@ -2362,7 +2405,7 @@ class SelectImage(Operator):
         items = [(str(i),x.name,x.name) for i,x in enumerate(bpy.data.images)]
         return items
     
-    select_images = EnumProperty(items = avail_images, name = "Available Images")
+    select_images: EnumProperty(items = avail_images, name = "Available Images")
        
     def execute(self,context):                 
         element =context.scene.objects[get_active_element()]
@@ -2379,7 +2422,7 @@ class OpenImage(Operator):
     bl_idname = "flare.open_image"
     bl_label = "Open an image"
     bl_description = "Open an image."     
-    filepath = StringProperty(subtype="FILE_PATH")
+    filepath: StringProperty(subtype="FILE_PATH")
         
     def execute(self, context):
         element = context.scene.objects[get_active_element()]
@@ -2540,25 +2583,25 @@ class RemoveUnusedMaterials(Operator):
 ######## the UI ##########
 
 # UI list draw (Flares)
-class SCENE_UL_flare(UIList):
+class UI_UL_flare(UIList):
    
    def draw_item(self, context, layout, data, item, icon, active_data, active_propname):
        row = layout.row()
        row.prop(item, "name", text="", emboss=False, icon = "MOD_PARTICLES")
             
 # UI list draw (Elements)
-class SCENE_UL_element(UIList):
+class UI_UL_element(UIList):
    
    def draw_item(self, context, layout, data, item, icon, active_data, active_propname):
-       obj = bpy.data.objects       
+       obj = bpy.data.objects
        row = layout.row()
        row.prop(item, "name", text="", emboss=False)
        row = layout.row()
        row.alignment = 'RIGHT'
-       row.prop(obj[item.object], "hide", text="", emboss=False)
+       row.prop(obj[item.object], "hide_viewport", text="", emboss=False, icon="HIDE_OFF")
        
 # UI list draw (Opstacles)       
-class SCENE_UL_opstacles(UIList):
+class UI_UL_opstacles(UIList):
    
    def draw_item(self, context, layout, data, item, icon, active_data, active_propname):
        row = layout.row()
@@ -2567,31 +2610,31 @@ class SCENE_UL_opstacles(UIList):
        
 # Special menu add flare
 class AddFlare(Menu):
-    bl_idname = "flare.add_flare_menu"
+    bl_idname = "FLARES_WIZARD_MT_add_flare_menu"
     bl_label = "Specials"
     bl_description = "Add lens flare."
 
     def draw(self, context):
         scn = context.scene
         layout = self.layout
-        layout.label(text="Add Lens Flare", icon = "FILE_NEW")        
+        layout.label(text = "Add Lens Flare", icon = "PLUS")
         layout.separator()
-        layout.operator("flare.create_lens_flare", text='New', icon = "ADD")
-        layout.operator("flare.load", text='Load', icon = "FILEBROWSER")
+        layout.operator("flare.create_lens_flare", text='New', icon = "PLUS")
+        layout.operator("flare.load", text='Load', icon = "FILE_FOLDER")
         layout.template_icon_view(scn, "LF_previews", show_labels=True)
           
        
 # Special menu add element
 class AddElement(Menu):
-    bl_idname = "flare.add_element_menu"
+    bl_idname = "FLARES_WIZARD_MT_add_element_menu"
     bl_label = "Specials"
     bl_description = "Add element."
 
     def draw(self, context):
         layout = self.layout
-        layout.label(text="Add element", icon = "FILE_NEW")        
+        layout.label(text = "Add element", icon = "PLUS")
         layout.separator()
-        layout.operator("flare.create_simple_element", text='Simple', icon = "SHADING_SOLID")
+        layout.operator("flare.create_simple_element", text='Simple', icon = "SPHERE")
         layout.operator("flare.create_ghost_element", text='Ghosts', icon = "GHOST_ENABLED")
         layout.operator("flare.create_star_element", text='Star', icon = "SOLO_OFF")
         layout.operator("flare.create_lens_dirt_element", text='Lens dirt', icon = "FREEZE")
@@ -2599,44 +2642,44 @@ class AddElement(Menu):
         
 # Special menu element settings
 class ElementSettings(Menu):
-    bl_idname = "flare.element_settings_menu"
+    bl_idname = "FLARES_WIZARD_MT_element_settings_menu"
     bl_label = "Specials"
     bl_description = "Element extra settings."
 
     def draw(self, context):
         layout = self.layout        
-        layout.operator("flare.duplicate_element", icon = "DUPLICATE")
+        layout.operator("flare.duplicate_element", icon = "DUPLICATE") #ROTATECOLLECTION
         layout.separator()
-        layout.operator("flare.show_all_elements", icon = "VIS_SEL_11")
-        layout.operator("flare.hide_all_elements", icon = "VIS_SEL_01")
-        layout.operator("flare.solo_element", icon = "VIS_SEL_11")
+        layout.operator("flare.show_all_elements", icon = "HIDE_OFF")
+        layout.operator("flare.hide_all_elements", icon = "HIDE_ON")
+        layout.operator("flare.solo_element", icon = "HIDE_OFF")
         
 # Special menu lens flare settings
 class FlaretSettings(Menu):
-    bl_idname = "flare.flare_settings_menu"
+    bl_idname = "FLARES_WIZARD_MT_flare_settings_menu"
     bl_label = "Specials"
     bl_description = "Flare extra settings."
 
     def draw(self, context):
         layout = self.layout        
-        layout.operator("flare.duplicate_lens_flare", icon = "DUPLICATE")        
-        layout.operator("flare.save", icon = "SAVE_COPY")
+        layout.operator("flare.duplicate_lens_flare", icon = "DUPLICATE") #ROTATECOLLECTION
+        layout.operator("flare.save", icon = "FILE_BACKUP") #SAVE_COPY
 
 # Special menu files shortcuts
 class FlareShortcuts(Menu):
-    bl_idname = "flare.files_shortcuts"
+    bl_idname = "FLARES_WIZARD_MT_files_shortcuts"
     bl_label = "Specials"
     bl_description = "Shortcuts."        
    
     def draw(self, context):
         layout = self.layout                
-        layout.operator("flare.open_elements_folder", icon = 'FILE_IMAGE')
-        layout.operator("flare.open_presets_folder", icon = 'FILEBROWSER')
+        layout.operator("flare.open_elements_folder", icon = 'IMAGE')
+        layout.operator("flare.open_presets_folder", icon = 'FILE')
         layout.operator("flare.open_manual" ,icon = 'QUESTION')
                 
 # Special menu cleanup
 class FlareCleanup(Menu):
-    bl_idname = "flare.cleanup"
+    bl_idname = "FLARES_WIZARD_MT_cleanup"
     bl_label = "Specials"
     bl_description = "Cleanup."        
    
@@ -2649,7 +2692,7 @@ class FlareCleanup(Menu):
         layout.operator("flare.remove_unused_materials", icon = 'MATERIAL_DATA' )  
         
 # Extras Panel
-class ExtrasPanel(Panel):
+class FLARES_WIZARD_PT_ExtrasPanel(Panel):
     bl_space_type = "VIEW_3D"
     bl_region_type = "UI"
     bl_category = "Lens Flares"
@@ -2661,12 +2704,12 @@ class ExtrasPanel(Panel):
         layout = self.layout
         box = layout.box()
         row = box.row()        
-        row.menu("flare.files_shortcuts" , text = 'Shortcuts', icon = "FILE_FOLDER")
-        row.menu("flare.cleanup" , text = 'Cleanup', icon = "PREFERENCES")
+        row.menu("FLARES_WIZARD_MT_files_shortcuts" , text = 'Shortcuts', icon = "FILE_FOLDER")
+        row.menu("FLARES_WIZARD_MT_cleanup" , text = 'Cleanup', icon = "PREFERENCES")
                 
        
 # Lens Flares Panel
-class LensFlaresPanel(Panel):
+class FLARES_WIZARD_PT_LensFlaresPanel(Panel):
     bl_space_type = "VIEW_3D"
     bl_region_type = "UI"
     bl_category = "Lens Flares"
@@ -2684,17 +2727,17 @@ class LensFlaresPanel(Panel):
             cam_vis = scn.objects[coll[index]['cam_vis']]
         
         row = layout.row()
-        row.template_list("SCENE_UL_flare", "coll", scn.flare_group, "coll", scn.flare_group, "index", rows = 2)
+        row.template_list("UI_UL_flare", "coll", scn.flare_group, "coll", scn.flare_group, "index", rows = 2)
         col = row.column(align=True)
-        col.menu("flare.add_flare_menu", icon='ADD', text="")
+        col.menu("FLARES_WIZARD_MT_add_flare_menu", icon='ADD', text="")
         col.operator("flare.delete_lens_flare", icon='REMOVE', text="")
-        col.menu("flare.flare_settings_menu", icon="TRIA_DOWN", text="")
+        col.menu("FLARES_WIZARD_MT_flare_settings_menu", icon="DOWNARROW_HLT", text="")
         
         if len(coll)>0:                
             column_flow = layout.column_flow()           
             row = column_flow.row()
             row.prop(scn, "flare_setings",
-            icon="TRIA_DOWN" if scn.flare_setings else "RIGHTARROW",
+            icon="DOWNARROW_HLT" if scn.flare_setings else "RIGHTARROW",
             icon_only=True, emboss=False)
             row.label(text='General settings')
             if scn.flare_setings:
@@ -2715,7 +2758,7 @@ class LensFlaresPanel(Panel):
             column_flow = layout.column_flow()
             row = column_flow.row()
             row.prop(scn, "pivot_setings",
-            icon="TRIA_DOWN" if scn.pivot_setings else "RIGHTARROW",
+            icon="DOWNARROW_HLT" if scn.pivot_setings else "RIGHTARROW",
             icon_only=True, emboss=False)
             row.label(text='Pivot point')
             if scn.pivot_setings:    
@@ -2726,26 +2769,26 @@ class LensFlaresPanel(Panel):
                 row.prop(pivot, '["x"]', text = "X position")
                 row.prop(pivot, '["y"]', text = "Y position")
                 
-            column_flow = layout.column_flow()
-            row = column_flow.row()
-            row.prop(scn, "LF_layers",
-            icon="TRIA_DOWN" if scn.LF_layers else "RIGHTARROW",
-            icon_only=True, emboss=False)
-            row.label(text='Layers')
-            if scn.LF_layers:    
-                row = column_flow.row()
-                row.alignment = 'LEFT'
-                row.label(' Select a layer     ')
-                row.template_layers(target, "layers", pivot, "layers", target['layer'])
-                row = column_flow.row()
-                row.alignment = 'LEFT'
-                row.label(' Move to selected')
-                row.operator("flare.move_to_layer", icon = 'SCREEN_BACK')
+            #column_flow = layout.column_flow()
+            #row = column_flow.row()
+            #row.prop(scn, "LF_layers",
+            #icon="DOWNARROW_HLT" if scn.LF_layers else "RIGHTARROW",
+            #icon_only=True, emboss=False)
+            #row.label(text='Layers')
+            #if scn.LF_layers:
+            #    row = column_flow.row()
+            #    row.alignment = 'LEFT'
+            #    row.label(text=' Select a layer     ')
+            #    row.template_layers(target, "layers", pivot, "layers", target['layer'])
+            #    row = column_flow.row()
+            #    row.alignment = 'LEFT'
+            #    row.label(text=' Move to selected')
+            #    row.operator("flare.move_to_layer", icon = 'SCREEN_BACK')
             
             column_flow = layout.column_flow()
             row = column_flow.row()
             row.prop(scn, "use_visibility",
-            icon="TRIA_DOWN" if scn.use_visibility else "RIGHTARROW",
+            icon="DOWNARROW_HLT" if scn.use_visibility else "RIGHTARROW",
             icon_only=True, emboss=False)
             row.prop(coll[index], "visibility", text = "Visibility to camera")
             if scn.use_visibility:    
@@ -2755,12 +2798,12 @@ class LensFlaresPanel(Panel):
             column_flow = layout.column_flow()
             row = column_flow.row()
             row.prop(scn, "use_opstacles",
-            icon="TRIA_DOWN" if scn.use_opstacles else "RIGHTARROW",
+            icon="DOWNARROW_HLT" if scn.use_opstacles else "RIGHTARROW",
             icon_only=True, emboss=False)
             row.prop(coll[index], "opstacles", text = "Use obstacles")
             if scn.use_opstacles:
                 row = column_flow.row()
-                row.template_list("SCENE_UL_opstacles", "coll", scn.opstacles_group, "coll", scn.opstacles_group, "index", rows = 2)
+                row.template_list("UI_UL_opstacles", "coll", scn.opstacles_group, "coll", scn.opstacles_group, "index", rows = 2)
                 col = row.column(align=True)
                 col.operator("flare.add_opstacle", icon='ADD', text="")
                 col.operator("flare.delete_opstacle", icon='REMOVE', text="")
@@ -2771,7 +2814,7 @@ class LensFlaresPanel(Panel):
             column_flow = layout.column_flow()
             row = column_flow.row()
             row.prop(scn, "use_blinking",
-            icon="TRIA_DOWN" if scn.use_blinking else "RIGHTARROW",
+            icon="DOWNARROW_HLT" if scn.use_blinking else "RIGHTARROW",
             icon_only=True, emboss=False)
             row.prop(coll[index], "blinking", text = "Blinking")
             if scn.use_blinking:
@@ -2785,7 +2828,7 @@ class LensFlaresPanel(Panel):
 
             
 # Lens Flare Elements            
-class LensFlaresElements(Panel):
+class FLARES_WIZARD_PT_LensFlaresElements(Panel):
     bl_space_type = "VIEW_3D"
     bl_region_type = "UI"
     bl_category = "Lens Flares"
@@ -2794,32 +2837,32 @@ class LensFlaresElements(Panel):
     @classmethod
     def poll(self, context):
         return len(context.scene.flare_group.coll)>0
-    
+
     def draw(self, context):        
-        scn = context.scene        
+        scn = context.scene
         layout = self.layout           
         row = layout.row()
-        row.template_list("SCENE_UL_element", "coll", scn.element_group, "coll", scn.element_group, "index", rows = 2)
+        row.template_list("UI_UL_element", "coll", scn.element_group, "coll", scn.element_group, "index", rows = 2)
         col = row.column(align=True)
-        col.menu("flare.add_element_menu", icon="ADD", text="")
+        col.menu("FLARES_WIZARD_MT_add_element_menu", icon="ADD", text="")
         col.operator("flare.delete_flare_element", icon='REMOVE', text="")
-        col.menu("flare.element_settings_menu", icon="TRIA_DOWN", text="")        
+        col.menu("FLARES_WIZARD_MT_element_settings_menu", icon="DOWNARROW_HLT", text="")
         
         if get_active_element() !="":
             coll, index = get_element_group()
             element = scn.objects[get_active_element()]
             cont = scn.objects[get_active_cont()]
             material = get_active_material()            
-            
+
             if element['ele_type']== 'simple':
                 column_flow = layout.column_flow()
                 row = column_flow.row()
                 row.prop(scn, "material",
-                icon="TRIA_DOWN" if scn.material else "RIGHTARROW",
+                icon="DOWNARROW_HLT" if scn.material else "RIGHTARROW",
                 icon_only=True, emboss=False)
                 row.label(text='Material & texture')
                 if scn.material:
-                    row  = column_flow.row()                    
+                    row  = column_flow.row()
                     row.prop(material['Mix.001'].inputs[0], "default_value", text = "Use Global Color")
                     row  = column_flow.row(align = True)
                     row.prop(material['Mix'].inputs[2], "default_value", text = "")
@@ -2827,17 +2870,17 @@ class LensFlaresElements(Panel):
                     row = column_flow.row()
                     row.prop(element, '["intensity"]', text = "Intensity")
                     row  = column_flow.row(align = True)
-                    row.operator_menu_enum("flare.select_image", "select_images", text = "", icon = "FILE_IMAGE")
+                    row.operator_menu_enum("flare.select_image", "select_images", text = "", icon = "GROUP_VERTEX")
                     row.prop(material['Image Texture'].image, "name", text = "")
-                    row.operator("flare.open_image", text = "", icon = "FILEBROWSER")
+                    row.operator("flare.open_image", text = "", icon = "FILE")
                     row = column_flow.row()
                 column_flow = layout.column_flow()
                 row = column_flow.row()
                 row.prop(scn, "transforms",
-                icon="TRIA_DOWN" if scn.transforms else "RIGHTARROW",
+                icon="DOWNARROW_HLT" if scn.transforms else "RIGHTARROW",
                 icon_only=True, emboss=False)
                 row.label(text='Transforms')
-                if scn.transforms:    
+                if scn.transforms:
                     col = column_flow.column(align = True)
                     col.prop(element, '["pos"]', text = "Position")
                     row = col.row(align = True)
@@ -2857,7 +2900,7 @@ class LensFlaresElements(Panel):
                 column_flow = layout.column_flow()
                 row = column_flow.row()
                 row.prop(scn, "material",
-                icon="TRIA_DOWN" if scn.material else "RIGHTARROW",
+                icon="DOWNARROW_HLT" if scn.material else "RIGHTARROW",
                 icon_only=True, emboss=False)
                 row.label(text='Material & texture')
                 if scn.material:                    
@@ -2874,9 +2917,9 @@ class LensFlaresElements(Panel):
                     row = column_flow.row()
                     row.prop(element, '["intensity"]', text = "Intensity")
                     row  = column_flow.row(align = True)
-                    row.operator_menu_enum("flare.select_image", "select_images", text = "", icon = "IMAGE_COL")
+                    row.operator_menu_enum("flare.select_image", "select_images", text = "", icon = "GROUP_VERTEX")
                     row.prop(material['Image Texture'].image, "name", text = "")
-                    row.operator("flare.open_image", text = "", icon = "FILESEL")
+                    row.operator("flare.open_image", text = "", icon = "FILE")
                     col = column_flow.column(align = True)
                     col.prop(material['Mix.003'].inputs[0], "default_value", text = "Outline opacity")
                     col.prop(element, '["outline"]', text = "Outline thickness")
@@ -2884,7 +2927,7 @@ class LensFlaresElements(Panel):
                 column_flow = layout.column_flow()
                 row = column_flow.row()
                 row.prop(scn, "transforms",
-                icon="TRIA_DOWN" if scn.transforms else "RIGHTARROW",
+                icon="DOWNARROW_HLT" if scn.transforms else "RIGHTARROW",
                 icon_only=True, emboss=False)
                 row.label(text='Transforms')
                 if scn.transforms:                                  
@@ -2908,7 +2951,7 @@ class LensFlaresElements(Panel):
                 column_flow = layout.column_flow()
                 row = column_flow.row()
                 row.prop(scn, "specials",
-                icon="TRIA_DOWN" if scn.specials else "RIGHTARROW",
+                icon="DOWNARROW_HLT" if scn.specials else "RIGHTARROW",
                 icon_only=True, emboss=False)
                 row.label(text='Special settings')
                 if scn.specials:                    
@@ -2920,7 +2963,7 @@ class LensFlaresElements(Panel):
                 column_flow = layout.column_flow()
                 row = column_flow.row()
                 row.prop(scn, "material",
-                icon="TRIA_DOWN" if scn.material else "RIGHTARROW",
+                icon="DOWNARROW_HLT" if scn.material else "RIGHTARROW",
                 icon_only=True, emboss=False)
                 row.label(text='Element settings')
                 if scn.material:
@@ -2932,9 +2975,9 @@ class LensFlaresElements(Panel):
                     row = column_flow.row()
                     row.prop(element, '["intensity"]', text = "Intensity")
                     row  = column_flow.row(align = True)
-                    row.operator_menu_enum("flare.select_image", "select_images", text = "", icon = "IMAGE_COL")
+                    row.operator_menu_enum("flare.select_image", "select_images", text = "", icon = "GROUP_VERTEX")
                     row.prop(material['Image Texture'].image, "name", text = "")
-                    row.operator("flare.open_image", text = "", icon = "FILESEL")
+                    row.operator("flare.open_image", text = "", icon = "FILE")
                     col = column_flow.column(align = True)
                     col.prop(element, '["scale"]', text = "Dirt size")
                     col.prop(material['ColorRamp'].color_ramp.elements[1], "position", text = "Smoothness")    
@@ -2942,7 +2985,7 @@ class LensFlaresElements(Panel):
                 column_flow = layout.column_flow()
                 row = column_flow.row()
                 row.prop(scn, "material",
-                icon="TRIA_DOWN" if scn.material else "RIGHTARROW",
+                icon="DOWNARROW_HLT" if scn.material else "RIGHTARROW",
                 icon_only=True, emboss=False)
                 row.label(text='Material & texture')
                 if scn.material:                    
@@ -2954,9 +2997,9 @@ class LensFlaresElements(Panel):
                     row = column_flow.row()
                     row.prop(element, '["intensity"]', text = "Intensity")
                     row  = column_flow.row(align = True)
-                    row.operator_menu_enum("flare.select_image", "select_images", text = "", icon = "IMAGE_COL")
+                    row.operator_menu_enum("flare.select_image", "select_images", text = "", icon = "GROUP_VERTEX")
                     row.prop(material['Image Texture'].image, "name", text = "")
-                    row.operator("flare.open_image", text = "", icon = "FILESEL")
+                    row.operator("flare.open_image", text = "", icon = "FILE")
                     col = column_flow.column(align = True)
                     col.prop(material['Mix.002'].inputs[0], "default_value", text = "Color variation")
                     col.prop(material['Hue Saturation Value'].inputs[0], "default_value", text = "Hue")
@@ -2966,7 +3009,7 @@ class LensFlaresElements(Panel):
                 column_flow = layout.column_flow()
                 row = column_flow.row()
                 row.prop(scn, "transforms",
-                icon="TRIA_DOWN" if scn.transforms else "RIGHTARROW",
+                icon="DOWNARROW_HLT" if scn.transforms else "RIGHTARROW",
                 icon_only=True, emboss=False)
                 row.label(text='Transforms')
                 if scn.transforms:                    
@@ -2989,7 +3032,7 @@ class LensFlaresElements(Panel):
                 column_flow = layout.column_flow()
                 row = column_flow.row()
                 row.prop(scn, "specials",
-                icon="TRIA_DOWN" if scn.specials else "RIGHTARROW",
+                icon="DOWNARROW_HLT" if scn.specials else "RIGHTARROW",
                 icon_only=True, emboss=False)
                 row.label(text='Special settings')
                 if scn.specials:                  
@@ -3001,16 +3044,16 @@ class LensFlaresElements(Panel):
                 column_flow = layout.column_flow()
                 row = column_flow.row()
                 row.prop(scn, "material",
-                icon="TRIA_DOWN" if scn.material else "RIGHTARROW",
+                icon="DOWNARROW_HLT" if scn.material else "RIGHTARROW",
                 icon_only=True, emboss=False)
                 row.label(text='Element settings')
                 if scn.material:
                     row  = column_flow.row()               
                     row.prop(element, '["intensity"]', text = "Opacity")
                     row  = column_flow.row(align = True)
-                    row.operator_menu_enum("flare.select_image", "select_images", text = "", icon = "IMAGE_COL")
+                    row.operator_menu_enum("flare.select_image", "select_images", text = "", icon = "GROUP_VERTEX")
                     row.prop(material['Image Texture'].image, "name", text = "")
-                    row.operator("flare.open_image", text = "", icon = "FILESEL")
+                    row.operator("flare.open_image", text = "", icon = "FILE")
                     row  = column_flow.row()                             
                     row.prop(scn.objects[element['controller']], '["z_offset"]', text = "Offset")
                     col  = column_flow.column(align = True)
@@ -3018,10 +3061,9 @@ class LensFlaresElements(Panel):
                     col.enabled = (image.image.source == 'MOVIE') or (image.image.source == 'SEQUENCE')
                     col.prop(image.image_user, 'frame_duration', text = "Frames")
                     col.prop(image.image_user, 'frame_start', text = "Start frame")
-                    col.prop(image.image_user, 'frame_offset', text = "Offset frames")     
-                     
-######## register  #########    
+                    col.prop(image.image_user, 'frame_offset', text = "Offset frames")
 
+# ------------------- Class List ------------------------------------------------
 classes = (
     Flare,
     FlareGroup,
@@ -3056,50 +3098,48 @@ classes = (
     RemoveUnusedImages,
     RemoveUnusedMeshes,
     RemoveUnusedMaterials,
-    SCENE_UL_flare,
-    SCENE_UL_element,
-    SCENE_UL_opstacles,
+    UI_UL_flare,
+    UI_UL_element,
+    UI_UL_opstacles,
     AddFlare,
     AddElement,
     ElementSettings,
     FlaretSettings,
     FlareShortcuts,
     FlareCleanup,
-    ExtrasPanel,
-    LensFlaresPanel,
-    LensFlaresElements,
+    FLARES_WIZARD_PT_ExtrasPanel,
+    FLARES_WIZARD_PT_LensFlaresPanel,
+    FLARES_WIZARD_PT_LensFlaresElements
 )
 
 
-#def register():
+######## register  #########    
+
+
 def register():
-    #bpy.utils.register_class(__name__)
     for cls in classes:
         bpy.utils.register_class(cls)
-    bpy.types.Scene.flare_group = PointerProperty(type=FlareGroup)
-    bpy.types.Scene.element_group = PointerProperty(type=ElementGroup)
-    bpy.types.Scene.opstacles_group = PointerProperty(type=OpstaclesGroup)
-    bpy.types.Scene.flare_setings = BoolProperty(default=False)
-    bpy.types.Scene.pivot_setings = BoolProperty(default=False)
-    bpy.types.Scene.material = BoolProperty(default=False)
-    bpy.types.Scene.transforms = BoolProperty(default=False)
-    bpy.types.Scene.specials = BoolProperty(default=False)
-    bpy.types.Scene.use_visibility = BoolProperty(default=False)
-    bpy.types.Scene.use_opstacles = BoolProperty(default=False)
-    bpy.types.Scene.use_blinking = BoolProperty(default=False)
-    bpy.types.Scene.LF_layers = BoolProperty(default=False)
+
+    bpy.types.Scene.flare_group = bpy.props.PointerProperty(type=FlareGroup)
+    bpy.types.Scene.element_group = bpy.props.PointerProperty(type=ElementGroup)
+    bpy.types.Scene.opstacles_group = bpy.props.PointerProperty(type=OpstaclesGroup)
+    bpy.types.Scene.flare_setings = bpy.props.BoolProperty(default=False)
+    bpy.types.Scene.pivot_setings = bpy.props.BoolProperty(default=False)
+    bpy.types.Scene.material = bpy.props.BoolProperty(default=False)
+    bpy.types.Scene.transforms = bpy.props.BoolProperty(default=False)
+    bpy.types.Scene.specials = bpy.props.BoolProperty(default=False)
+    bpy.types.Scene.use_visibility = bpy.props.BoolProperty(default=False)
+    bpy.types.Scene.use_opstacles = bpy.props.BoolProperty(default=False)
+    bpy.types.Scene.use_blinking = bpy.props.BoolProperty(default=False)
+    bpy.types.Scene.LF_layers = bpy.props.BoolProperty(default=False)
     
     pcoll = previews.new()     
     preview_collections["LF_previews"] = pcoll
-    bpy.types.Scene.LF_previews = EnumProperty(items=flare_previews(), update=load_update_preview)
+    bpy.types.Scene.LF_previews = bpy.props.EnumProperty(items=flare_previews(), update=load_update_preview)
 
        
 
-#def unregister():
 def unregister():
-    #bpy.utils.unregister_class(__name__)
-    for cls in classes:
-        bpy.utils.unregister_class(cls)
     del bpy.types.Scene.flare_group
     del bpy.types.Scene.element_group
     del bpy.types.Scene.opstacles_group
@@ -3119,7 +3159,9 @@ def unregister():
 
     del bpy.types.Scene.LF_previews
     
-    
+    for cls in classes:
+        bpy.utils.unregister_class(cls)
+
 
 
 if __name__ == "__main__":

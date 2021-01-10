@@ -51,12 +51,12 @@ def add_distance_var(driver, name, target1, target2):
     
 def add_flare_object(type, name, flare, flare_name, cam, hide = True, hide_sel = True):
     if type == 'empty':
-        bpy.ops.object.empty_add(type = 'SPHERE', radius = 0.03, location = cam.location, rotation = cam.rotation_euler)
+        bpy.ops.object.empty_add(type = 'SPHERE', location = cam.location, rotation = cam.rotation_euler) # radius = 0.03,
     elif type == 'plane':
-        bpy.ops.mesh.primitive_plane_add(size = 0.15, location=cam.location,rotation = cam.rotation_euler)        
+        bpy.ops.mesh.primitive_plane_add(location=cam.location,rotation = cam.rotation_euler) # radius = 0.15,
     ob = bpy.context.object
     if type == 'plane':
-        ob.display_type = 'WIRE'            
+        ob.display_type = 'TEXTURED'            
     ob.parent = cam
     ob.name = name
     ob.location = Vector((0, 0, 0))

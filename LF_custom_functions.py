@@ -33,10 +33,10 @@ def get_distance(loc1, loc2):
 
 def RayCast(obj, start, end):
     """ Ray cast wraper """ 
-    scn = bpy.context.scene    
-    bvh = tree.FromObject(obj, scn)    
-    localStart = obj.matrix_world.inverted() * start
-    localEnd = obj.matrix_world.inverted() * end
+    deps = bpy.context.view_layer.depsgraph
+    bvh = tree.FromObject(obj, deps)    
+    localStart = obj.matrix_world.inverted() @ start
+    localEnd = obj.matrix_world.inverted() @ end
     direction = localEnd- localStart
     ray = bvh.ray_cast(localStart, direction, get_distance(localEnd, localStart))
     return(ray[2])    
